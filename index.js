@@ -6,8 +6,12 @@ function generateColor() {
   return `rgb(${generateNumber()}, ${generateNumber()}, ${generateNumber()})`;
 }
 
-function main () {
+function main() {
 
 }
 
 window.onload = main;
+
+module.exports = {
+  generateColor, generateNumber,
+};
