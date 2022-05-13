@@ -1,4 +1,8 @@
 const containerOptions = document.querySelector('.options-container');
+const correctElementText = document.getElementById('correct-rgb');
+const skipButton = document.getElementById('skip-question');
+const resultText = document.getElementById('result-text');
+const score = document.getElementById('score');
 
 function generateNumber(maxNumber) {
   return Math.floor(Math.random() * maxNumber);
@@ -28,7 +32,13 @@ function appendElement(element, parent) {
   parent.appendChild(element);
 }
 
+function clearElementHtml(parent) {
+  const elementToclear = parent;
+  elementToclear.innerHTML = '';
+}
+
 function createOptions(quantity) {
+  clearElementHtml(containerOptions);
   for (let i = 0; i < quantity; i += 1) {
     const element = generateElement('div', 'option');
     appendElement(element, containerOptions);
@@ -42,14 +52,49 @@ function changeBackGround(elementsHTML, colors) {
   });
 }
 
-function main() {
-  const correctColor = generateNumber(5);
+function generateColorAndIndex() {
   const colors = generateTotalColors(5);
+  const correctColor = colors[generateNumber(5)];
+  return { colors, correctColor };
+}
+
+function calculateScore(scoreRound) {
+  const prevScore = score.innerText.split(':')[1];
+  score.innerText = `Score: ${scoreRound + (+prevScore)}`;
+}
+
+function validateResponse({ target }, correctColor) {
+  const responseIsCorrect = target.style.background === correctColor;
+  if (responseIsCorrect) {
+    resultText.innerText = 'Parabéns, você acertou!';
+    calculateScore(3);
+  } else {
+    resultText.innerText = 'lamento, você errou!';
+    calculateScore(-3);
+  }
+  main();
+}
+
+function manipulateOptions({ colors, correctColor }) {
   const TOTAL_OPTIONS = 5;
   createOptions(TOTAL_OPTIONS);
   const elementsOptions = document.querySelectorAll('.option');
   changeBackGround(elementsOptions, colors);
+  correctElementText.innerText = correctColor;
+
+  elementsOptions.forEach((element) => {
+    element.addEventListener('click', (event) => {
+      validateResponse(event, correctColor);
+    });
+  });
 }
+
+function main() {
+  const { colors, correctColor } = generateColorAndIndex();
+  manipulateOptions({ colors, correctColor });
+}
+
+skipButton.addEventListener('click', main);
 
 window.onload = main;
 
